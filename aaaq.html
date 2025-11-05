@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="kk" data-theme="desert">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Қаратау қазба байлықтары — Кең формат · Анимациялар</title>
+  <style>
+    /* =====================================================
+       EXPANDED LAYOUT + CREATIVE ANIMATIONS (No libs)
+       ===================================================== */
+    :root{ --radius: 18px; --shadow: 0 24px 60px rgba(0,0,0,.10); --gap: 24px; --ring: 0 0 0 3px rgba(0,0,0,.14); --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", Arial; }
+    html,body{height:100%}
+    body{ margin:0; font-family: var(--font); line-height:1.7; letter-spacing:.2px; color:var(--ink); background:var(--bg); transition: background .3s ease, color .2s ease; }
+
+    .site{ display:grid; grid-template-rows: auto 1fr auto; min-height:100dvh; }
+    .container{ width:min(1280px, 92vw); margin-inline:auto; }
+
+    .topbar{ position:sticky; top:0; z-index:50; backdrop-filter: blur(8px); background: color-mix(in oklab, var(--surface), transparent 8%); border-bottom: 1px solid var(--border); }
+    .topbar-inner{ display:flex; align-items:center; gap:16px; padding: 12px 16px; }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px; }
+    .logo{ width:28px; height:28px; border-radius:8px; background: var(--accent-gradient); box-shadow: 0 2px 10px color-mix(in oklab, var(--accent-mid), transparent 70%); position:relative; overflow:hidden; }
+    .logo::after{ content:""; position:absolute; inset:0; background: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in oklab, var(--accent-mid), white 60%) 6px 8px); opacity:.5; mix-blend-mode: overlay; }
+    .nav{ margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+    .nav a{ text-decoration:none; padding:10px 12px; border-radius:10px; border:1px solid var(--border); color:var(--ink); background: var(--chip-bg); font-weight:600; font-size:14px; }
+
+    .switcher{ display:flex; gap:8px; margin-left:8px; }
+    .chip{ border:1px solid var(--border); background: var(--chip-bg); color:var(--ink); padding:8px 11px; border-radius:999px; cursor:pointer; font-weight:700; font-size:13px; transition: transform .15s ease, box-shadow .15s ease; }
+    .chip:hover{ transform: translateY(-1px) scale(1.02); box-shadow: var(--shadow); }
+    .chip[aria-current="true"]{ box-shadow: 0 0 0 2px var(--chip-ring) inset; }
+
+    .hero{ position:relative; padding: clamp(48px, 12vw, 120px) 0; overflow:hidden; }
+    .hero h1{ font-size: clamp(34px, 6vw, 64px); line-height: 1.08; margin:0 0 12px; font-weight: 900; }
+    .hero p{ color: var(--muted); font-size: clamp(16px, 1.8vw, 18px); margin:0 0 20px; }
+    .cta{ display:flex; gap:12px; flex-wrap:wrap; }
+    .btn{ appearance:none; border:none; cursor:pointer; border-radius: 14px; padding: 14px 18px; font-weight:800; letter-spacing:.3px; }
+    .btn.primary{ background: var(--accent-gradient); color: #052022; box-shadow: 0 10px 24px color-mix(in oklab, var(--accent-mid), transparent 75%); }
+    .btn.ghost{ background: var(--button-bg); border:1px solid var(--border); color: var(--ink); }
+
+    .hero-grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap: clamp(18px,3vw,28px); align-items:center; }
+    @media (max-width: 960px){ .hero-grid{ grid-template-columns: 1fr; } }
+
+    .hero-card{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); position:relative; }
+    .hero-gallery{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ph{ aspect-ratio: 4/3; border-radius: 14px; background: var(--image-bg); border: 1px dashed var(--image-border); display:grid; place-items:center; color:var(--muted-strong); font-weight:800; }
+
+    /* === NEW: кесусіз фото-контейнер === */
+    .photo-frame{
+      grid-column: span 2;
+      aspect-ratio: 3/4;                    /* тіке кадр үшін ыңғайлы */
+      background: var(--image-bg);
+      border: 1px dashed var(--image-border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      max-height: clamp(240px, 60vh, 760px);
+    }
+    .photo-frame img{
+      width: 100%;
+      height: 100%;
+      object-fit: contain;                   /* кесусіз көрсету */
+      object-position: center;
+      display: block;
+    }
+
+    .mountains{ position:absolute; inset:0; z-index:-1; pointer-events:none; }
+
+    section.block{ padding: clamp(24px, 6vw, 56px) 0; }
+    .grid-wide{ display:grid; grid-template-columns: 1.6fr .9fr; gap: var(--gap); }
+    @media (max-width: 900px){ .grid-wide{ grid-template-columns: 1fr; } }
+
+    .card{ background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(16px,3vw,28px); }
+    .card h3{ margin-top:0; font-size: clamp(18px, 2vw, 22px); }
+    .muted{ color: var(--muted); }
+
+    .pill{ display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background: var(--chip-bg); font-weight:700; font-size:12px; color:var(--ink); }
+
+    .list{ display:grid; gap:12px; }
+
+    /* Accordion */
+    details.accordion{ border:1px solid var(--border); border-radius:12px; background: var(--section-bg); padding: 10px 14px; }
+    details.accordion > summary{ cursor:pointer; font-weight:800; list-style:none; outline:none; }
+    details.accordion > summary::-webkit-details-marker{ display:none; }
+    details.accordion[open]{ box-shadow: var(--shadow); }
+
+    /* Masonry */
+    .masonry{ columns: 1; column-gap: 16px; }
+    @media (min-width: 700px){ .masonry{ columns: 2; } }
+    @media (min-width: 1100px){ .masonry{ columns: 3; } }
+    .tile{ break-inside: avoid; border-radius: 14px; background: var(--image-bg); border:1px dashed var(--image-border); height: clamp(160px, 26vh, 260px); margin: 0 0 16px; display:grid; place-items:center; color: var(--muted-strong); font-weight:800; transform: translateY(8px); background-size: cover; background-position: center; }
+
+    .extras{ display:grid; gap: var(--gap); }
+    .extra{ text-align:center; padding: 22px 18px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--button-bg); color:var(--ink); font-weight:800; letter-spacing:.3px; transition: transform .2s; cursor:pointer; user-select:none; }
+    .extra:hover{ transform: translateY(-2px) scale(1.01); }
+
+    footer{ padding: 28px 0 40px; text-align:center; color:var(--muted); font-size: 12px; }
+
+    /* Animations */
+    @keyframes floatUp { from{ transform: translateY(0); opacity:.0 } to{ transform: translateY(-20px); opacity:.6 } }
+    @keyframes sparkle { 0%,100%{ opacity:.2 } 50%{ opacity:1 } }
+    @keyframes cart { 0%{ transform: translateX(-10%) } 50%{ transform: translateX(10%) } 100%{ transform: translateX(-10%) } }
+    @keyframes swing { 0%{ transform: rotate(-6deg) } 50%{ transform: rotate(6deg) } 100%{ transform: rotate(-6deg) } }
+
+    .reveal{ opacity:0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.show{ opacity:1; transform: none; }
+
+    /* THEMES ... (сол күйі қалды) */
+    html[data-theme="desert"]{ --bg: radial-gradient(80% 60% at 50% 0%, #f0f7f9 0%, #eef6f6 35%, #E8DCCB 100%);
+      --surface: linear-gradient(180deg, #F5F5F1, #ffffff); --border: rgba(32,48,56,.08); --shadow: 0 18px 50px rgba(0,0,0,.10);
+      --ink:#203038; --muted:#56656B; --muted-strong:#48565B; --image-bg: linear-gradient(180deg, rgba(72,183,174,.08), rgba(191,165,136,.12)), repeating-linear-gradient(135deg,#e9eee9 0 10px,#f5f7f5 10px 20px);
+      --image-border: rgba(32,48,56,.15); --section-bg:#f1efe9; --button-bg:#ffffff; --chip-bg:#ffffff; --chip-ring: rgba(72,183,174,.6); --accent-gradient: linear-gradient(90deg,#48B7AE,#BFA588); --accent-mid:#48B7AE; }
+    html[data-theme="salt"]{ --bg: linear-gradient(180deg,#ffffff,#f7f9fb); --surface:#ffffff; --border: rgba(31,37,51,.07); --shadow: 0 18px 50px rgba(31,37,51,.08);
+      --ink:#1d2a30; --muted:#63727A; --muted-strong:#4c5a60; --image-bg: repeating-linear-gradient(45deg,#f3f6f8 0 14px,#eef2f5 14px 28px);
+      --image-border: rgba(29,42,48,.12); --section-bg:#f7f9fb; --button-bg:#fdfefe; --chip-bg:#f7f9fb; --chip-ring: rgba(29,42,48,.25); --accent-gradient: linear-gradient(90deg,#7bd5cf,#c8d0d6); --accent-mid:#7bd5cf; }
+    html[data-theme="clay"]{ --bg: linear-gradient(180deg,#f4ece4,#efe3d6); --surface: linear-gradient(180deg,#fff8f1,#fff); --border: rgba(120,74,48,.18); --shadow: 0 20px 52px rgba(120,74,48,.16);
+      --ink:#2a211e; --muted:#7a6a63; --muted-strong:#5b4c45; --image-bg: linear-gradient(180deg,rgba(191,165,136,.22),rgba(255,216,196,.18));
+      --image-border: rgba(120,74,48,.25); --section-bg:#f6eee6; --button-bg:#fff8f1; --chip-bg:#fff4e6; --chip-ring: rgba(191,165,136,.55); --accent-gradient: linear-gradient(90deg,#d4a373,#8d6e63); --accent-mid:#d4a373; }
+    html[data-theme="caspian"]{ --bg: radial-gradient(100% 100% at 50% 0%, #0c1b1f 0%, #0e2529 40%, #0b1a1e 100%); --surface: linear-gradient(180deg,#122529,#101f23); --border: rgba(255,255,255,.08); --shadow: 0 24px 60px rgba(0,0,0,.55);
+      --ink:#E7F5F2; --muted:#A0B8B4; --muted-strong:#CDE5E1; --image-bg: linear-gradient(180deg,rgba(27,179,170,.18),rgba(20,107,102,.22));
+      --image-border: rgba(255,255,255,.12); --section-bg: rgba(255,255,255,.04); --button-bg:#11272b; --chip-bg:#0f2428; --chip-ring: rgba(72,183,174,.7); --accent-gradient: linear-gradient(90deg,#48B7AE,#AEDDD8); --accent-mid:#48B7AE; }
+
+    /* ---------- Modal (sources & viewer) ---------- */
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; place-items:center; z-index:100; }
+    .modal{ width:min(820px,92vw); max-height:82vh; overflow:auto; background:var(--surface); border:1px solid var(--border); border-radius:20px; box-shadow: var(--shadow); padding:20px; }
+    .modal h4{ margin: 0 0 8px; }
+    .modal .close{ float:right; border:1px solid var(--border); background:var(--chip-bg); border-radius:10px; padding:6px 10px; cursor:pointer; font-weight:800; }
+    .sources-list{ padding-left:18px; }
+    .viewer-img{ width:100%; height:auto; border-radius:14px; border:1px solid var(--border); background:var(--image-bg); }
+    .note{ font-size:12px; color:var(--muted); margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <!-- Sticky Topbar -->
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <div class="brand"><span class="logo" aria-hidden="true"></span> Қаратау қазба байлықтары</div>
+        <nav class="nav">
+          <a href="#desc">Сипаттама</a>
+          <a href="#topics">Тақырыптар</a>
+          <a href="#gallery">Фотолар</a>
+          <a href="#sources">Дереккөздер</a>
+        </nav>
+        <div class="switcher" role="tablist" aria-label="Тақырып модельдері">
+          <button class="chip" data-set-theme="desert" aria-current="true">Desert</button>
+          <button class="chip" data-set-theme="salt">Salt</button>
+          <button class="chip" data-set-theme="clay">Clay</button>
+          <button class="chip" data-set-theme="caspian">Caspian</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <header class="hero">
+      <svg class="mountains" viewBox="0 0 1440 600" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="ridge" x1="0" x2="1"><stop offset="0%" stop-color="rgba(72,183,174,.25)"/><stop offset="100%" stop-color="rgba(191,165,136,.25)"/></linearGradient>
+          <linearGradient id="shadow" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="rgba(0,0,0,.08)"/><stop offset="100%" stop-color="rgba(0,0,0,0)"/></linearGradient>
+        </defs>
+        <path d="M0,380 L180,300 L320,360 L520,260 L760,340 L980,260 L1200,320 L1440,260 L1440,600 L0,600 Z" fill="url(#ridge)" opacity=".6"></path>
+        <path d="M0,430 L160,360 L300,400 L470,340 L660,420 L820,360 L980,410 L1180,360 L1440,420 L1440,600 L0,600 Z" fill="url(#shadow)"></path>
+        <g style="animation: cart 12s linear infinite; transform-box: fill-box; transform-origin: center;">
+          <rect x="300" y="410" width="70" height="32" rx="6" fill="rgba(32,48,56,.7)"/>
+          <circle cx="315" cy="445" r="8" fill="rgba(72,183,174,.9)"/>
+          <circle cx="355" cy="445" r="8" fill="rgba(72,183,174,.9)"/>
+        </g>
+        <g>
+          <polygon points="1020,350 1040,320 1060,350 1040,380" fill="rgba(72,183,174,.85)"></polygon>
+          <circle cx="1040" cy="320" r="3" fill="#fff" style="animation: sparkle 1.6s ease-in-out infinite"></circle>
+          <circle cx="1060" cy="350" r="2.5" fill="#fff" style="animation: sparkle 2.1s .3s ease-in-out infinite"></circle>
+          <circle cx="1020" cy="350" r="2.5" fill="#fff" style="animation: sparkle 2s .6s ease-in-out infinite"></circle>
+        </g>
+        <g>
+          <circle cx="600" cy="420" r="2" fill="rgba(191,165,136,.9)" style="animation: floatUp 2.2s ease-in-out infinite alternate"></circle>
+          <circle cx="610" cy="430" r="2" fill="rgba(191,165,136,.7)" style="animation: floatUp 2.6s .3s ease-in-out infinite alternate"></circle>
+          <circle cx="590" cy="435" r="2" fill="rgba(191,165,136,.8)" style="animation: floatUp 2.4s .6s ease-in-out infinite alternate"></circle>
+        </g>
+      </svg>
+
+      <div class="container hero-grid">
+        <div>
+          <h1>Маңғыстау табиғаты: <br> таулар, минералдар және ғылым</h1>
+          <p>Жас зерттеушілерге арналған креативті сайт</p>
+          <div class="cta">
+            <a class="btn primary" href="#gallery">Фотогалерея</a>
+            <a class="btn ghost" href="#sources">Дереккөздер</a>
+          </div>
+        </div>
+        <!-- HERO CARD (A, B, панорама суреттерімен) -->
+        <div class="hero-card reveal">
+          <div class="pill" aria-hidden="true">Зерттеу жұмыстары</div>
+          <div class="hero-gallery" style="margin-top:12px">
+            <!-- Сурет A -->
+            <div class="ph" aria-label="Сурет A" style="position:relative; background-image:url('images/qaratau-a.jpg'); background-size:cover; background-position:center;">
+              <svg width="0" height="0" viewBox="0 0 100 100" style="position:absolute; inset:auto 10px 10px auto; width:40px; height:40px;">
+                <polyline points="0,60 10,58 20,62 30,55 40,70 50,30 60,65 70,55 80,62 90,58 100,60" fill="none" stroke="currentColor" stroke-width="3">
+                  <animate attributeName="points" dur="2.5s" repeatCount="indefinite" values="0,60 10,58 20,62 30,55 40,70 50,30 60,65 70,55 80,62 90,58 100,60;0,60 10,62 20,58 30,70 40,35 50,65 60,30 70,68 80,58 90,62 100,60;0,60 10,58 20,62 30,55 40,70 50,30 60,65 70,55 80,62 90,58 100,60" />
+                </polyline>
+              </svg>
+            </div>
+            <!-- Сурет B -->
+            <div class="ph" aria-label="Сурет B" style="display:grid;place-items:center; background-image:url('images/qaratau-b.jpg'); background-size:cover; background-position:center;">
+              <svg viewBox="0 0 100 100" style="width:40px;height:40px;">
+                <g style="transform-origin:50% 50%; animation: swing 2.8s ease-in-out infinite;">
+                  <rect x="46" y="25" width="8" height="50" rx="3" fill="currentColor"/>
+                  <path d="M20,32 Q50,10 80,32" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+                </g>
+              </svg>
+            </div>
+            <!-- Панорама -->
+            <div class="ph" aria-label="Панорама" style="grid-column: span 2; aspect-ratio: 16/7; background-image:url('images/qaratau-panorama.jpg'); background-size:cover; background-position:center;"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <section class="block" id="desc">
+      <div class="container grid-wide">
+        <article class="card reveal">
+          <h3>Сипаттама</h3>
+          <p class="muted">Қаратау жотасына жалпы сипаттама
+          Қаратау жотасы Маңғыстау облысы аумағында орналасқан ең маңызды географиялық нысандардың бірі. Оның ұзындығы шамамен 110 км, ал ені 12 км-ге дейін жетеді. Қаратау жотасының ең биік нүктесі – Бесшоқы тауы, ол 556 м биіктікте орналасқан. Бұл тау жоталары геологиялық тұрғыдан өте ежелгі және Пермь кезеңіне жататын метаморфтанған құмтас, әктас және конгломераттардан тұрады.
+          Жер бедері ойлы-қырлы, шатқалдары терең және сай-жыралармен тілімделген. Мұнда Сарыбұлақ, Жаманүшқұз сынды табиғи бұлақтар орналасқан. Қаратау сілемдері Шетпе ауылын қоршап жатыр, бұл ауыл аудан орталығы болып табылады. Қаратау табиғатының басты ерекшелігі – геологиялық құрылымы мен минералдық ресурстарының молдығы. Мұнда темір, мыс, көмір, шойын, мәрмәр тас, фосфорит және марганец сияқты пайдалы қазбалар бар. Бұл ресурстарды игеру Маңғыстау өңірінің ғана емес, жалпы Қазақстанның экономикасына оң ықпал етеді.. Қаратау сілемдерінен су алатын 20 шақты орын бар. Олардың ішінде ең ірілері- Тұщыбек, Шайыр, Шетпе, Қарақұдық, Онды, Жармыш, Ағашты, Аусары, Күркүреуік, Керіз, Доллы апа. Бұлардағы су мүмкіндігі 1,5-тен 6,3 л/с дейін, ал атпалы түтіктердегі 5-15 л/с ке дейін, кей жерлерде 23 л/с дейін (Қарақұдық), кей жылдары бірсыпыра су көздерінің (Тұщыбек, Шайыр) өнімділігі көктемде 15-25 л/с жетеді. Пайдаланатын су қоры әп түрлі әдіспен есептегенде 260 л/с деп бағаланады, және пайдалы қазбалаларға, яғни мұнай, мыс, темір, шойын, мәрмәр тастарына фосфориттерге және тағы басқа пайдалы қазбаларға өте бай екенін білдім. 
+          Қазақстанның геологиялық қорларын зерттеу Қаныш Сәтбаевтан бастау алады. Ол 20-ғасырдың ортасында еліміздің кен орындарын зерттеп, марганец, темір, мыс, көмір қорларының әлеуетін алғаш бағалаған.
+          Қаратау жотасының геологиялық жасы – палеозой эрасы, яғни 300-400 млн жыл бұрын қалыптасқан.
+          Бұл жотада Сақ, Ғұн дәуірінің көне қорғандары мен қоныстары кездеседі. Яғни, ол тек геологиялық емес, тарихи-мәдени нысан ретінде де маңызды. Флора мен фауна: Қаратау флорасында дәрілік өсімдіктер (адыраспан, жантақ, көктерек) өседі. Бұл өсімдіктердің медицинада қолданылу мүмкіндіктері бар.</p>
+        </article>
+        <aside class="card reveal">
+          <div class="pill">Суреттер</div>
+          <div class="hero-gallery" style="margin-top:12px">
+            <div class="ph" style="background-image:url('images/qaratau-a.jpg'); background-size:cover; background-position:center;" aria-label="сурет 1"></div>
+            <div class="ph" style="background-image:url('images/qaratau-b.jpg'); background-size:cover; background-position:center;" aria-label="сурет 2"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Topics / Sections (ACCORDION) -->
+    <section class="block" id="topics">
+      <div class="container list">
+        <details class="accordion reveal" open>
+          <summary>Таушық елді мекеніндегі тас көмір қазба байлығы</summary>
+          <div style="margin-top:10px">
+            <p>Маңғыстау жаңа шахта құрылыс одақ басқармасы Кеңес Одағының көмір өнеркәсібі Халық Комиссарының 1939 жылғы 23 сәуірдегі №66 бұйрығымен құрылған. Оның мақсаты – Каспий теңізі Маңғышлақ түбегінде көмір шахталарын салу жөніндегі 1939 жылғы 17 сәуірдегі Кеңес Министрлері Кеңесі мен  Орталық Комитетінің №504 қаулысына сәйкес, Приволжье және Гурьев аудандарын көмірмен қамтамасыз ету.
+            Басқарма Маңғышлақ көмір кен орнында тәулігіне 1000 тонна, жылына 300000 тонна өндіретін алты көлбеу өндірістік барлау шахтасын салу міндетін алды. Бас құрылыс алаңы Таушық ауылында орналасқан. Астрахань және Махачкала қалаларында негізгі материалдық-техникалық база болды.
+            Алғашқы №2 және №3 шахталар 1939 жылдың 31 желтоқсанында іске қосылды, №6 шахта – 1940 жылдың 28 ақпанында, №7 шахта – 1940 жылдың 31 тамызында, ал 1941 жылы №5 және №8 шахталар іске қосылды.
+            Тресттің негізгі міндеті – көмір кен орындарын пайдалану болды. Трест кәсіпорындардың жоспарлы, ұйымдастырушылық және оперативтік-шаруашылық басқаруын жүзеге асырып, шаруашылық есептің талдауын жүргізді. Трест заңды тұлға мәртебесіне ие болды.
+            Бұйрыққа сәйкес трест құрамына №2, 3, 5, 6, 7, 8 шахталар кірді, олардың №2, 3, 6, 7-сі шаруашылық есеп негізінде жұмыс істеді.
+            Екінші дүниежүзілік соғыс жылдарында шахталарда еңбек ресурстары жетіспеді. 1942 жылы әскери қызметке 274 адам шақырылды, негізінен тау-кен жұмысшылары. Көмірді қолмен өндірді. Сол кезде тек №7 шахта жұмыс істеді, қалғандары консервацияға қойылды. Көмір өз қажеттіліктеріне және трест жұмысшылары мен жергілікті ұйымдарға сатылды. Трест бюджет қаражатымен өмір сүрді. Келесі жылдары жағдай өзгермеді, шахталар консервацияда қалды, өндіріс көлемі артқан жоқ.
+            1947 жылы 1947–1948 жылдары шахталарды қалпына келтіру мен салуды дайындау үшін жобалау және зерттеу жұмыстары жүргізілетін шешім қабылданды. 
+            1949 жылдың 1 қаңтарына дейін трест 103416 тонна көмір өндірді, жоспарланған жылдық көлемі – 300000 тонна.
+            Сондықтан тресттің тиімсіздігін ескере отырып, 1949 жылғы 1 ақпандағы КСРО Министрлер Кеңесінің №1057-р қаулысы және 1949 жылғы 7 ақпандағы КСРО шығыс аудандары көмір өнеркәсібі министрлігінің №78 бұйрығы бойынша «Маңғышлаққұрылыс» тресі жойылды.</p>
+
+            <!-- ҚОСЫМША ЕКІ КНОПКА: ФОТО-ПРЕВЬЮ АШАДЫ -->
+            <div class="cta" style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn primary" id="btnDocPhoto" type="button">PDF / Документ жүктеу</button>
+              <button class="btn ghost" id="btnActPhoto" type="button">Акт документ</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="accordion reveal">
+          <summary>Шпак экспедициясы</summary>
+          <div style="margin-top:10px">
+            <p>Өлкеде болашағы зор марганец кендері бар. Оларға Батыс Қаратау жотасынан 3-5 км оңтүстікке 35 км-ге ұзына бойы созылып, тізбектеліп жатқан Сарытаған, Шақырған, Қарақыз, Қызылтұран кен орындары жатады. Руданың құрамындағы марганецтің үлесі 11-12 %-ға жетеді. Марганец рудасы қара металлургия өнеркəсібіне қажетті шикізат болып табылады. Марганец рудасы – болат өндірісінде өте маңызды рөл атқарады. Марганецсіз болатты берік ету мүмкін емес.
+            1953-1954 жылдары марганец рудасы қажет болып, Одақ бойынша экспедиция құрылған. Оған басшы етіп Екінші дүниежүзілік соғыстың ардагері, 1920 жылы туған Кирилл Игнатьевич Шпак тағайындалған. Экспедиция марганец қорын анықтау үшін, бірнеше шахталар қазған. Олар көлденең де, тігінен де қазылған шахталар болатын. Көбінің орыны көміліп қалған, кейбіреулерін адам, мал түсіп кетеді деген қауіппен кейінгілер көміп тастаған. Ұзындығы 65 метір бір шахта жақсы сақталған. Экспедиция мемлекеттік қамту бағытында жасақталып, өте жақсы қаржыландырылған. Экспедицияның экскаваторы, қызыметтік көліктері, токарь станогы басқа да керек жарақтары болған. Жоғарыға есеп беру үшін, Гурьев қаласына қатынасып отырған. Кейін марганец қоры анықталғанмен, оның өндірістік мақсатта пайдалануға әлі шикілеу деген есеппен, экспедиция өз мақсатына жетіп, жұмысын аяқтаған. Ал, экспедиция басшысы К.И.Шпак өмірінің соңғы жылдарында Гурьев қаласында тұрған. Сол жердегі «Орыс моласы» қауымында жерленгені. 
+            К.И.Шпак жеке өмірі жайлы айтатын болсақ. Сарытаған құпия экспедициясының бастығы - Кирилл Шпак Игнатьевич. Ол Грузияның Боржоми қаласында 1920 жылы дүниеге келген. Боржоми қаласынан орта мектепті бітірген. Кирилл соғысқа дейін Москва Құрыш балқыту институтының «гидро-геолог» мамандығы бойынша бітірген. 1941 жылы ҰОС алынып, аман оралған соң, сол оқу орнын қайта жалғастырған. Сарытаған экспедициясы тараған соң, ол Жетібайда Гурьев кірпіш зауытында басшы, кейін сол зауытта инженер, мастер. Кірпіш зауытының дəл жанында тышқан аулайтын Шумный болды. Сарытағандағы экспедицияда басында орыс, украин, неміс т.б түрлі халықтың өкілдері қызмет етті. 
+            Сарытаған маңындағы Шпак экспедициясы құпия түрде жұмыс істеген, себебі Кеңес үкіметі үшін стратегиялық металдар – жабық нысан болған.</p>
+
+            <!-- Фото: Шпак экспедициясы (кесусіз) -->
+            <div class="hero-gallery" style="margin-top:12px">
+              <div class="photo-frame" aria-label="Шпак экспедициясының архивтік фото">
+                <img src="images/shpak-expedition.jpg"
+                     alt="Шпак экспедициясы, Сарытаған маңы. Архивтік фото" loading="lazy">
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Masonry (7 фото) -->
+    <section class="block" id="gallery">
+      <div class="container">
+        <h3 style="margin:0 0 12px">Қосымша фотолары</h3>
+        <div class="masonry">
+          <div class="tile reveal" style="height:220px; background-image:url('images/gallery1.jpg');" aria-label="фото 1"></div>
+          <div class="tile reveal" style="height:260px; background-image:url('images/gallery2.jpg');" aria-label="фото 2"></div>
+          <div class="tile reveal" style="height:240px; background-image:url('images/gallery3.jpg');" aria-label="фото 3"></div>
+          <div class="tile reveal" style="height:300px; background-image:url('images/gallery4.jpg');" aria-label="фото 4"></div>
+          <div class="tile reveal" style="height:200px; background-image:url('images/gallery5.jpg');" aria-label="фото 5"></div>
+          <div class="tile reveal" style="height:180px; background-image:url('images/gallery6.jpg');" aria-label="фото 6"></div>
+          <div class="tile reveal" style="height:260px; background-image:url('images/gallery7.jpg');" aria-label="фото 7"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sources (PDF extra removed) -->
+    <section class="block" id="sources">
+      <div class="container extras">
+        <div id="btnSources" class="extra reveal">Дереккөздер тізімі</div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">© 2025 · Маңғыстау табиғатынан шабыт · Кең формат · Анимациялар</div>
+    </footer>
+  </div>
+
+  <!-- MODALS -->
+  <div id="sourcesModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="sourcesTitle">
+    <div class="modal">
+      <button class="close" data-close-sources>Жабу</button>
+      <h4 id="sourcesTitle">Дереккөздер</h4>
+      <ol class="sources-list">
+        <li>«Маңғыстау» энциклопедиясы. Атамұра, 1997 ж. — Автор: Ә. Кекілбаев.</li>
+        <li>«Маңғыстау» энциклопедиясы. Алматы, 2008 ж.</li>
+        <li>С. Қалпақова ауызша әңгімелерінен.</li>
+        <li>С. Әнес жазбалары мен баяндамаларынан.</li>
+        <li>Е. Әуелбаев ауызша әңгімелерінен.</li>
+        <li>«Тұщыбек кіндігімді кескен жерім». Алматы, 2001 ж. — Авторы: Уәзіров Қ.</li>
+        <li>«Маңғыстаудың жер-су атаулары». Алматы: «Арыс», 2010 ж. — Автор: Серікбол Қондыбай.</li>
+        <li>«Маңғыстау географиясы». Алматы: «Арыс», 2010 ж. — Автор: Серікбол Қондыбай.</li>
+        <li>«Ғаламторлық байланыс» — www.google.kz (Интернет жүйесі).</li>
+        <li>«Қазақстан – 2030» бағдарламасы.</li>
+        <li>Археограф С. К. Ахмеджанова жазбасы.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Viewer Modal for photo / pdf preview -->
+  <div id="viewerModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
+    <div class="modal">
+      <button class="close" data-close-viewer>Жабу</button>
+      <h4 id="viewerTitle">Құжат алдын ала қарау</h4>
+      <img id="viewerImg" class="viewer-img" alt="Құжаттың фотосы" src="" />
+      <div class="note"></div>
+    </div>
+  </div>
+
+  <script>
+    // Theme switcher
+    const root = document.documentElement;
+    const buttons = document.querySelectorAll('[data-set-theme]');
+    const apply = (name)=>{
+      root.setAttribute('data-theme', name);
+      buttons.forEach(b=>b.setAttribute('aria-current', b.dataset.setTheme===name ? 'true':'false'));
+      try{ localStorage.setItem('mng-theme', name);}catch(e){}
+    };
+    buttons.forEach(b=> b.addEventListener('click', ()=> apply(b.dataset.setTheme)));
+    try{ const saved = localStorage.getItem('mng-theme'); if(saved){ apply(saved);} }catch(e){}
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', e=>{
+        const id=a.getAttribute('href').slice(1);
+        const el=document.getElementById(id);
+        if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth', block:'start'}); }
+      });
+    });
+
+    // Scroll reveal
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('show'); io.unobserve(en.target); } });
+    }, { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+
+    // Parallax for hero SVG
+    const hero = document.querySelector('.hero');
+    const svg = document.querySelector('.mountains');
+    hero.addEventListener('pointermove', (e)=>{
+      const r = hero.getBoundingClientRect();
+      const x = (e.clientX - r.left)/r.width - .5;
+      const y = (e.clientY - r.top)/r.height - .5;
+      svg.style.transform = `translate(${x*-10}px, ${y*-6}px)`;
+    });
+
+    /* =========================
+       SOURCES MODAL
+       ========================= */
+    const sourcesModal = document.getElementById('sourcesModal');
+    document.getElementById('btnSources').addEventListener('click', ()=> {
+      sourcesModal.style.display = 'grid';
+    });
+    document.querySelector('[data-close-sources]').addEventListener('click', ()=> {
+      sourcesModal.style.display = 'none';
+    });
+    sourcesModal.addEventListener('click', (e)=>{
+      if(e.target === sourcesModal) sourcesModal.style.display = 'none';
+    });
+
+    /* =========================
+       VIEWER (PHOTO preview)
+       ========================= */
+    const viewerModal = document.getElementById('viewerModal');
+    const viewerImg   = document.getElementById('viewerImg');
+    const btnDocPhoto = document.getElementById('btnDocPhoto');
+    const btnActPhoto = document.getElementById('btnActPhoto');
+
+    const DOC_PHOTO_URL = 'images/taushyq-doc.jpg';
+    const ACT_PHOTO_URL = 'images/taushyq-act.jpg';
+
+    if(btnDocPhoto){
+      btnDocPhoto.addEventListener('click', ()=>{
+        viewerImg.src = DOC_PHOTO_URL;
+        viewerModal.style.display = 'grid';
+      });
+    }
+    if(btnActPhoto){
+      btnActPhoto.addEventListener('click', ()=>{
+        viewerImg.src = ACT_PHOTO_URL;
+        viewerModal.style.display = 'grid';
+      });
+    }
+
+    document.querySelector('[data-close-viewer]').addEventListener('click', ()=> {
+      viewerModal.style.display = 'none';
+      viewerImg.src = '';
+    });
+    viewerModal.addEventListener('click', (e)=>{
+      if(e.target === viewerModal){
+        viewerModal.style.display = 'none';
+        viewerImg.src = '';
+      }
+    });
+  </script>
+</body>
+</html>
